@@ -67,13 +67,15 @@ class WaveNet(nn.Module):
         
         return loss
     
-    def generate(self, inputs, time_steps):
+    def generate(self, inputs, time_steps, verbose=False):
         x = inputs
-        for _ in range(time_steps):
-            prob = self.forward(inputs)
-            category = torch.argmax(prob, dim=0)
+        for i in range(time_steps):
+            if verbose == True and i % 100 == 0: 
+                print(f"Time Step: {i} and length: {x.shape(-1)}")
+            prob = self.forward(x)
+            category = torch.argmax(prob, dim=1)
             pred = decodeMuLaw(category)
-            x = torch.cat((x, pred.view(1,1,1)), dim=2)
+            x = torch.cat((x, pred.view(1,1,-1)), dim=2)
         
         return x
     
