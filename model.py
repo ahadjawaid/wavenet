@@ -64,6 +64,8 @@ class WaveNet(nn.Module):
         optimizer.step()
         if verbose:
             print(f"Loss: {loss.item()}")
+        
+        return loss
     
     def generate(self, inputs, time_steps):
         x = inputs
