@@ -71,7 +71,7 @@ class WaveNet(nn.Module):
         x = inputs
         for i in range(time_steps):
             if verbose == True and i % 100 == 0: 
-                print(f"Time Step: {i} and length: {x.shape(-1)}")
+                print(f"Time Step: {i} and length: {x.size(-1)}")
             prob = self.forward(x)
             category = torch.argmax(prob, dim=1)
             pred = decodeMuLaw(category)
