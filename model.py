@@ -48,11 +48,11 @@ class WaveNet(nn.Module):
         return head_out
     
     def oneMaskStep(self, inputs, mask_index, optimizer, loss_fn, verbose=True):
-        masked_inputs = inputs[:,:,:mask_index]
+
 
         optimizer.zero_grad()
 
-        pred = self.forward(masked_inputs)
+        pred = self.forward(inputs[:,:,mask_index-self.receptive_field-1:mask_index])
 
         targets = muLaw(inputs[:,:,mask_index+1])
         one_hot_target = one_hot(targets, num_classes=self.quantize_channels)

@@ -6,9 +6,8 @@ import os
 import torch
 
 class AudioMP3Dataset(Dataset):
-    def __init__(self, root_dir, transforms=None, max_len=50000, sample_rate=16000):
+    def __init__(self, root_dir, transforms=None, sample_rate=16000):
         self.root_dir = Path(root_dir)
-        self.max_len = max_len
         self.sample_rate = sample_rate
         self.transforms = transforms
         self.music_files = list(filter(lambda x: ".mp3" in x, os.listdir(root_dir)))
