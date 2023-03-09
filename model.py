@@ -76,20 +76,17 @@ class WaveNet(nn.Module):
             x = torch.cat((x, pred.view(1,1,1)), dim=2)
         
         return x
+    
+    def saveState(self, path):
+        torch.save(self.state_dict(), path)
+    
+    def loadState(self, path):
+        self.load_state_dict(torch.load(path))
 
 
 class ResidualLayer(nn.Module):
     def __init__(self, dilation, residual_channels=32, gate_channels=32, skip_channels=512,
                  local_channels=0, global_channels=0, kernal_size=3):
-        '''
-        Args:
-            dilation: (int)
-            residual_channels: (int)
-            gate_channels: (int)
-            skip_channels: (int)
-            local_channels: (int) 0 if no local conditional inputs
-            global_channels: (int) 0 if no global conditional inputs
-        '''
         super(ResidualLayer, self).__init__()
         self.dilated_conv = DialatedConv1d(residual_channels, gate_channels, dilation, kernal_size)
         
