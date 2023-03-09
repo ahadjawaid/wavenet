@@ -5,12 +5,12 @@ import librosa
 import os
 import torch
 
-class AudioMP3Dataset(Dataset):
-    def __init__(self, root_dir, transforms=None, sample_rate=16000):
+class AudioDataset(Dataset):
+    def __init__(self, root_dir, format="wav", transforms=None, sample_rate=16000):
         self.root_dir = Path(root_dir)
         self.sample_rate = sample_rate
         self.transforms = transforms
-        self.music_files = list(filter(lambda x: ".mp3" in x, os.listdir(root_dir)))
+        self.music_files = list(filter(lambda x: f".{format}" in x, os.listdir(root_dir)))
         
     def __len__(self):
         return len(self.music_files)
