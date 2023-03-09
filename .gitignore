@@ -2,3 +2,4 @@ __pycache__
 piano_music
 .ipynb_checkpoints
 .DS_Store
+model_checkpoints
