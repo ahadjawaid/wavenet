@@ -3,6 +3,7 @@ import torch.nn as nn
 from preprocess import muLaw, decodeMuLaw
 from math import ceil
 from torch.nn.functional import one_hot
+from utils import calculateReceptiveField
 
 class WaveNet(nn.Module):
     def __init__(self, num_residual_layers, num_blocks, num_casual_layers, residual_channels=32, 
@@ -27,8 +28,7 @@ class WaveNet(nn.Module):
         self.residual_blocks = nn.ModuleList(residual_layers * num_blocks)
         
         self.head = Head(skip_channels, quantize_channels)
-        
-    
+         
     def forward(self, inputs, local_inputs=None, global_inputs=None):
         quantized_inputs = muLaw(inputs)
         embedded_inputs = self.emedding_layer(quantized_inputs).squeeze(1).transpose(1,2)
@@ -74,6 +74,7 @@ class WaveNet(nn.Module):
             x = torch.cat((x, pred.view(1,1,1)), dim=2)
         
         return x
+
 
 class ResidualLayer(nn.Module):
     def __init__(self, dilation, residual_channels=32, gate_channels=32, skip_channels=512,
@@ -131,7 +132,8 @@ class ResidualLayer(nn.Module):
         residual_out += clipped_inputs
         
         return residual_out, skip_out
-    
+
+
 class Head(nn.Sequential):
     def __init__(self, in_channels, out_channels,  **kwargs):
         super(Head, self).__init__(
@@ -150,7 +152,8 @@ class Head(nn.Sequential):
         summed_inputs = inputs.sum(dim=1).view(batch_size,-1,1)
 
         return super().forward(summed_inputs)
-    
+
+
 class CasualConv1D(nn.Conv1d):
     def __init__(self, in_channels, out_channels, kernel_size, **kwargs):
         super(CasualConv1D, self).__init__(in_channels, out_channels, kernel_size, 
@@ -161,6 +164,7 @@ class CasualConv1D(nn.Conv1d):
         activations = super(CasualConv1D, self).forward(inputs)
         return activations[:,:,:activations.shape[-1]-self.kernel_size[0]]
 
+
 class DialatedConv1d(nn.Conv1d):
     def __init__(self, in_channels, out_channels, dilation, kernel_size, **kwargs):
         super(DialatedConv1d, self).__init__(in_channels, out_channels, kernel_size,
@@ -169,13 +173,10 @@ class DialatedConv1d(nn.Conv1d):
     def forward(self, inputs):
         return super(DialatedConv1d, self).forward(inputs)
 
+
 class Conv1d1x1(nn.Conv1d):
     def __init__(self, in_channels, out_channels,  **kwargs):
         super(Conv1d1x1, self).__init__(in_channels, out_channels, kernel_size=1,  **kwargs)
         
     def forward(self, inputs):
         return super(Conv1d1x1, self).forward(inputs)
-    
-def calculateReceptiveField(res_layers, res_blocks, kernal_size):
-    dialtions = [2**i for i in range(res_layers)] * res_blocks
-    return (kernal_size - 1) * sum(dialtions) + 1 
