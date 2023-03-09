@@ -77,11 +77,11 @@ class WaveNet(nn.Module):
         
         return x
     
-    def saveState(self, path):
-        torch.save(self.state_dict(), path)
+    def saveState(self, path, device="cpu"):
+        torch.save(self.to(device).state_dict(), path)
     
-    def loadState(self, path):
-        self.load_state_dict(torch.load(path))
+    def loadState(self, path, device="cpu"):
+        self.to(device).load_state_dict(torch.load(path))
 
 
 class ResidualLayer(nn.Module):
