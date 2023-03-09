@@ -52,7 +52,7 @@ class WaveNet(nn.Module):
 
         optimizer.zero_grad()
 
-        pred = self.forward(inputs[:,:,mask_index-self.receptive_field-1:mask_index])
+        pred = self.forward(inputs[:,:,:mask_index])
 
         targets = muLaw(inputs[:,:,mask_index+1])
         one_hot_target = one_hot(targets, num_classes=self.quantize_channels)
